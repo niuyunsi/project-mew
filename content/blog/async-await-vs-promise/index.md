@@ -4,7 +4,7 @@ date: "2020-12-12"
 description: A few difference.
 ---
 
-#### Error handling
+## Error handling
 
 1. Promises
 
