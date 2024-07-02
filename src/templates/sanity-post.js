@@ -43,14 +43,14 @@ const SanityPostTemplate = ({
         >
           <li>
             {previous && (
-              <Link to={`/sanity-post/${previous.slug.current}`} rel="prev">
+              <Link to={previous.fields.slug} rel="prev">
                 ← {previous.title}
               </Link>
             )}
           </li>
           <li>
             {next && (
-              <Link to={`/sanity-post/${next.slug.current}`} rel="next">
+              <Link to={next.fields.slug} rel="next">
                 {next.title} →
               </Link>
             )}
@@ -86,14 +86,14 @@ export const pageQuery = graphql`
     }
     previous: sanityPost(id: { eq: $previousPostId }) {
       title
-      slug {
-        current
+      fields {
+        slug
       }
     }
     next: sanityPost(id: { eq: $nextPostId }) {
       title
-      slug {
-        current
+      fields {
+        slug
       }
     }
   }

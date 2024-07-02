@@ -75,8 +75,8 @@ createSanityPages = async ({ graphql, createPage, reporter }) => {
         nodes {
           id
           title
-          slug {
-            current
+          fields {
+            slug
           }
         }
       }
@@ -91,13 +91,12 @@ createSanityPages = async ({ graphql, createPage, reporter }) => {
 
   if (sanityPosts.length > 0) {
     sanityPosts.forEach((post, index) => {
-      const path = `/sanity-post/${post.slug.current}`
       const previousPostId = index === 0 ? null : sanityPosts[index - 1].id
       const nextPostId =
         index === sanityPosts.length - 1 ? null : sanityPosts[index + 1].id
 
       createPage({
-        path,
+        path: post.fields.slug,
         component: sanityPost,
         context: { id: post.id, previousPostId, nextPostId },
       })
@@ -112,7 +111,19 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
   const { createNodeField } = actions
 
   if (node.internal.type === `MarkdownRemark`) {
-    const value = createFilePath({ node, getNode })
+    // NOTE(yunsi): create a slug for Markdown posts. e.g. `/blog-post/my-post`
+    const value = `/blog-post${createFilePath({ node, getNode })}`
+
+    createNodeField({
+      name: `slug`,
+      node,
+      value,
+    })
+  }
+
+  if (node.internal.type === `SanityPost`) {
+    // NOTE(yunsi): create a slug for Sanity posts. e.g. `/sanity-post/my-post`
+    const value = `/sanity-post/${node.slug.current}/`
 
     createNodeField({
       name: `slug`,
@@ -163,6 +174,10 @@ exports.createSchemaCustomization = ({ actions }) => {
 
     type Fields {
       slug: String
+    }
+
+    type SanityPost implements Node {
+      fields: Fields
     }
   `)
 }
