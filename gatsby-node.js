@@ -9,6 +9,7 @@ const { createFilePath } = require(`gatsby-source-filesystem`)
 
 // Define the template for blog post
 const blogPost = path.resolve(`./src/templates/blog-post.js`)
+const sanityPost = path.resolve(`./src/templates/sanity-post.js`)
 
 /**
  * @type {import('gatsby').GatsbyNode['createPages']}
@@ -16,6 +17,11 @@ const blogPost = path.resolve(`./src/templates/blog-post.js`)
 exports.createPages = async ({ graphql, actions, reporter }) => {
   const { createPage } = actions
 
+  await createBlogPages({ graphql, createPage, reporter })
+  await createSanityPages({ graphql, createPage, reporter })
+}
+
+createBlogPages = async ({ graphql, createPage, reporter }) => {
   // Get all markdown blog posts sorted by date
   const result = await graphql(`
     {
@@ -57,6 +63,43 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
           previousPostId,
           nextPostId,
         },
+      })
+    })
+  }
+}
+
+createSanityPages = async ({ graphql, createPage, reporter }) => {
+  const sanityResult = await graphql(`
+    {
+      allSanityPost {
+        nodes {
+          id
+          title
+          slug {
+            current
+          }
+        }
+      }
+    }
+  `)
+
+  if (sanityResult.errors) {
+    throw sanityResult.errors
+  }
+
+  const sanityPosts = sanityResult.data.allSanityPost.nodes || []
+
+  if (sanityPosts.length > 0) {
+    sanityPosts.forEach((post, index) => {
+      const path = `/sanity-post/${post.slug.current}`
+      const previousPostId = index === 0 ? null : sanityPosts[index - 1].id
+      const nextPostId =
+        index === sanityPosts.length - 1 ? null : sanityPosts[index + 1].id
+
+      createPage({
+        path,
+        component: sanityPost,
+        context: { id: post.id, previousPostId, nextPostId },
       })
     })
   }
