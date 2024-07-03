@@ -17,8 +17,10 @@ const sanityPost = path.resolve(`./src/templates/sanity-post.js`)
 exports.createPages = async ({ graphql, actions, reporter }) => {
   const { createPage } = actions
 
-  await createBlogPages({ graphql, createPage, reporter })
-  await createSanityPages({ graphql, createPage, reporter })
+  await Promise.all([
+    createBlogPages({ graphql, createPage, reporter }),
+    createSanityPages({ graphql, createPage, reporter }),
+  ])
 }
 
 createBlogPages = async ({ graphql, createPage, reporter }) => {
@@ -122,7 +124,6 @@ createSanityPages = async ({ graphql, createPage, reporter }) => {
 
   const [draftPosts, publishedPosts] = sanityPosts.reduce(
     (acc, post) => {
-      console.log(post.isDraft)
       if (post.isDraft) {
         acc[0].push(post)
       } else {
