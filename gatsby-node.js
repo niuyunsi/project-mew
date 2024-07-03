@@ -28,6 +28,9 @@ createBlogPages = async ({ graphql, createPage, reporter }) => {
       allMarkdownRemark(sort: { frontmatter: { date: ASC } }, limit: 1000) {
         nodes {
           id
+          frontmatter {
+            isDraft
+          }
           fields {
             slug
           }
@@ -50,10 +53,25 @@ createBlogPages = async ({ graphql, createPage, reporter }) => {
   // But only if there's at least one markdown file found at "content/blog" (defined in gatsby-config.js)
   // `context` is available in the template as a prop and as a variable in GraphQL
 
-  if (posts.length > 0) {
-    posts.forEach((post, index) => {
-      const previousPostId = index === 0 ? null : posts[index - 1].id
-      const nextPostId = index === posts.length - 1 ? null : posts[index + 1].id
+  const [draftPosts, publishedPosts] = posts.reduce(
+    (acc, post) => {
+      if (post.frontmatter.isDraft) {
+        acc[0].push(post)
+      } else {
+        acc[1].push(post)
+      }
+      return acc
+    },
+    [[], []]
+  )
+
+  if (publishedPosts.length > 0) {
+    publishedPosts.forEach((post, index) => {
+      const previousPostId = index === 0 ? null : publishedPosts[index - 1].id
+      const nextPostId =
+        index === publishedPosts.length - 1
+          ? null
+          : publishedPosts[index + 1].id
 
       createPage({
         path: post.fields.slug,
@@ -66,12 +84,24 @@ createBlogPages = async ({ graphql, createPage, reporter }) => {
       })
     })
   }
+
+  if (draftPosts.length > 0) {
+    draftPosts.forEach((post, index) => {
+      createPage({
+        path: post.fields.slug,
+        component: blogPost,
+        context: {
+          id: post.id,
+        },
+      })
+    })
+  }
 }
 
 createSanityPages = async ({ graphql, createPage, reporter }) => {
   const sanityResult = await graphql(`
     {
-      allSanityPost {
+      allSanityPost(sort: { publishedAt: DESC }) {
         nodes {
           id
           title
@@ -170,6 +200,7 @@ exports.createSchemaCustomization = ({ actions }) => {
       title: String
       description: String
       date: Date @dateformat
+      isDraft: Boolean
     }
 
     type Fields {

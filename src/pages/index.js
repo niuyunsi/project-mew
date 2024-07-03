@@ -80,7 +80,10 @@ export const pageQuery = graphql`
         title
       }
     }
-    allMarkdownRemark(sort: { frontmatter: { date: DESC } }) {
+    allMarkdownRemark(
+      sort: { frontmatter: { date: DESC } }
+      filter: { frontmatter: { isDraft: { ne: true } } }
+    ) {
       nodes {
         excerpt
         fields {
@@ -90,6 +93,7 @@ export const pageQuery = graphql`
           date(formatString: "MMMM DD, YYYY")
           title
           description
+          isDraft
         }
       }
     }
