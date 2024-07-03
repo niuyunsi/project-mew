@@ -105,6 +105,7 @@ createSanityPages = async ({ graphql, createPage, reporter }) => {
         nodes {
           id
           title
+          isDraft
           fields {
             slug
           }
@@ -119,16 +120,41 @@ createSanityPages = async ({ graphql, createPage, reporter }) => {
 
   const sanityPosts = sanityResult.data.allSanityPost.nodes || []
 
-  if (sanityPosts.length > 0) {
-    sanityPosts.forEach((post, index) => {
-      const previousPostId = index === 0 ? null : sanityPosts[index - 1].id
+  const [draftPosts, publishedPosts] = sanityPosts.reduce(
+    (acc, post) => {
+      console.log(post.isDraft)
+      if (post.isDraft) {
+        acc[0].push(post)
+      } else {
+        acc[1].push(post)
+      }
+      return acc
+    },
+    [[], []]
+  )
+
+  if (publishedPosts.length > 0) {
+    publishedPosts.forEach((post, index) => {
+      const previousPostId = index === 0 ? null : publishedPosts[index - 1].id
       const nextPostId =
-        index === sanityPosts.length - 1 ? null : sanityPosts[index + 1].id
+        index === publishedPosts.length - 1
+          ? null
+          : publishedPosts[index + 1].id
 
       createPage({
         path: post.fields.slug,
         component: sanityPost,
         context: { id: post.id, previousPostId, nextPostId },
+      })
+    })
+  }
+
+  if (draftPosts.length > 0) {
+    draftPosts.forEach((post, index) => {
+      createPage({
+        path: post.fields.slug,
+        component: sanityPost,
+        context: { id: post.id },
       })
     })
   }

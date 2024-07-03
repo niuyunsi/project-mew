@@ -93,11 +93,13 @@ export const pageQuery = graphql`
           date(formatString: "MMMM DD, YYYY")
           title
           description
-          isDraft
         }
       }
     }
-    allSanityPost(sort: { publishedAt: DESC }) {
+    allSanityPost(
+      sort: { publishedAt: DESC }
+      filter: { isDraft: { ne: true } }
+    ) {
       nodes {
         id
         publishedAt(formatString: "MMMM DD, YYYY")
