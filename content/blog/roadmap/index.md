@@ -52,4 +52,17 @@ We want to have this done before the Q4 Quarterly Meeting so that we can use thi
 |   ✔    | Pull data from Sanity.io                                  |        |            |
 |   ✔    | Handle draft posts in Sanity.io and Gatsby                |        |            |
 |   ✔    | Manually trigger a deploy on Vercel from Sanity.io studio |        |            |
-|   ❌   | Automatically trigger a deploy                            |        |            |
+|        | Automatically trigger a deploy                            |        |            |
+
+| Status | Goal                                                 | Labels | Repository |
+| :----: | :--------------------------------------------------- | ------ | ---------- |
+|   ✔    | Containerize the Gatsby site                         |        |            |
+|   ✔    | Push the Image to ECR                                |        |            |
+|   ✔    | Install Docker on EC2 instance                       |        |            |
+|   ✔    | Install Docker Compose on EC2 instance               |        |            |
+|   ✔    | Create a Docker Compose file                         |        |            |
+|   ✔    | Run the Gatsby site and a server with Docker Compose |        |            |
+|        | Setup Nginx as a reverse proxy                       |        |            |
+|        | Setup SSL with Let's Encrypt                         |        |            |
+|        | Setup a CI/CD pipeline                               |        |            |
+|        | Assign a domain name                                 |        |            |
